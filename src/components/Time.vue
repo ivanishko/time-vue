@@ -1,11 +1,11 @@
 <template>
 <div>
 
-    <p class="date">{{ date }}</p>
-    <p class="time">{{ time1 }}</p>
-    <p class="time">{{ time2 }}</p>
-    <p class="time">{{ results }}</p>
-    <p class="text">ЦИФРОВЫЕ ЧАСЫ с Vue.js</p>
+    <p class="time">time{{ timeLocal }}</p>
+    <p class="time">results{{ results }}</p>
+    <p class="time">getGlobalTime2 {{ getGlobalTime() }}</p>
+    <p class="time">GlobalTime {{ timeGlobal }}</p>
+
 
 </div>
 </template>
@@ -17,7 +17,8 @@
         data() {
             return {
                 date: '',
-                time: '',
+                timeLocal: '',
+                timeGlobal: '',
                 timer: true,
                 time1: this.setTimer1(),
                 time2: this.setTimer2(),
@@ -37,27 +38,40 @@
                     return i;
                 },
                 getCurrentTime1(){
-                    var time1, h1, m1,s1;
-                    time1 = new Date(Date.now());
 
-                    h1 = time1.getHours();
-                    m1 = time1.getMinutes();
-                    s1 = time1.getSeconds();
-                    let time = (toString(h1 + 2) + ':' + toString(m1) + ':' + toString(s1)) ;
-                    //console.log(time);
-                    return time;
+                    let time1 = new Date(Date.now());
+
+                    let h1 = this.addZero(time1.getHours());
+                    let m1 = this.addZero(time1.getMinutes());
+                    let s1 = this.addZero(time1.getSeconds());
+                    this.timeLocal = ((h1).toString() + ":" + (m1).toString() + ':' + (s1).toString()) ;
+
                 },
-                getCurrentTime2(){
-                    var time2, h2, m2,s2;
-                    time2 = new Date(this.results);
+                getGlobalTime(){
 
-                    h2 = time2.getHours();
-                    m2 = this.addZero(time2.getMinutes());
-                    s2 = this.addZero(time2.getSeconds());
-                    let time = (`${h2}':'${m2}':'${s2}`) ;
-                    console.log(time);
+                    var time2 = new Date(this.results);
+                    this.timeGlobal = time2;
+                    let h2 = this.addZero(time2.getHours());
+                    let m2 = this.addZero(time2.getMinutes());
+                    let s2 = this.addZero(time2.getSeconds());
+                    let time = ((h2).toString() + ':' + (m2).toString() + ':' + (s2).toString()) ;
+                    //console.log(time);
+
                     return (time);
                 },
+
+                // checkGlobalTime() {
+                //     setTimeout(function () {
+                //         let time = new Date(this.results);
+                //         this.timeGlobal = time.setTime(time.getTime + 1)
+                //         }
+                //
+                //         ,1000)
+                //
+                //
+                // },
+
+
 
 
 
@@ -65,13 +79,14 @@
                     return setInterval(this.getCurrentTime1,1000);
                 },
                 setTimer2(){
-                    return setInterval(this.getCurrentTime2,1000);
+                    return setTimeout(this.getGlobalTime,1000);
                 },
 
             },
-            created() {
+
+            mounted() {
                 axios.get('https://worldtimeapi.org/api/timezone/Europe/Moscow')
-                    .then(response => this.results = response.data.datetime)
+                    .then(response => this.results = response.data.datetime);
             }
 
     }
